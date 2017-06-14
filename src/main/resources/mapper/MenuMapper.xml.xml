@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dao.MenuDao">
+
+
+    <select id="findById" parameterType="int" resultType="com.iflytek.model.SYS_Menu">
+        SELECT * FROM sys_menu where menuID = #{mid}
+    </select>
+
+
+
+    <select id="getNoChoiceMenuAuth" parameterType="int" resultType="com.iflytek.model.SYS_Menu">
+SELECT sys_menu.* FROM sys_menu
+WHERE sys_menu.menuID NOT IN(
+SELECT sys_menu.menuID
+FROM sys_menu
+INNER JOIN sys_permission
+ON sys_permission.permissionAccess='menu'
+AND sys_permission.permissionAccessValue = sys_menu.menuID
+AND sys_permission.roleID = #{rid}
+AND sys_permission.permissionOperation = 1
+)
+
+    </select>
+    <select id="getChoiceMenuAuth" parameterType="int" resultType="com.iflytek.model.SYS_Menu">
+        SELECT sys_menu.*
+        FROM sys_menu
+        INNER JOIN sys_permission
+        ON sys_permission.permissionAccess='menu'
+        AND sys_permission.permissionAccessValue = sys_menu.menuID
+        AND sys_permission.roleID = #{rid}
+        AND sys_permission.permissionOperation = 1
+    </select>
+
+    <select id="findByAccount" parameterType="String" resultType="com.iflytek.model.SYS_Menu">
+       SELECT * FROM sys_menu
+INNER JOIN sys_permission ON sys_permission.permissionAccess='menu' AND sys_permission.permissionAccessValue = sys_menu.menuID
+INNER JOIN sys_user_role ON sys_permission.roleID = sys_user_role.roleID
+INNER JOIN sys_user ON sys_user_role.userID = sys_user.userID
+WHERE sys_user.account = #{account} GROUP BY sys_menu.menuID
+    </select>
+
+</mapper>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta content="text/html;charset=UTF-8"/>
+    <title sec:authentication="name"></title>
+    <link rel="stylesheet" th:href="@{css/bootstrap.min.css}" />
+    <script type="text/javascript" th:src="@{js/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{js/bootstrap.min.js}"></script>
+    <script type="text/javascript" th:src="@{js/multiselect.min.js}"></script>
+    <script type="text/javascript" th:src="@{js/prettify.min.js}"></script>
+    <style type="text/css">
+        .pageData{
+            padding-top: 50px;
+        }
+        .starter-template {
+            padding: 40px 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<script type="text/javascript">
+    var userID ;
+    function getInfo(uid){
+        var str = "";
+        var str1 = "";
+        $.ajax( {
+            url : "/user/UpdateRole/getInfo/"+uid,
+            dataType:"json",
+            success : function(data) {
+                $.each(data.uncheck, function(idx, obj) {
+                    str += '<option value="' + obj.roleID + '">' + obj.roleName + '</option>';
+                });
+                $("#multiselect").find("option").remove();
+                $("#multiselect").append(str);
+                $.each(data.checked, function(idx, obj) {
+                    str1 += '<option value="' + obj.roleID + '">' + obj.roleName + '</option>';
+                });
+                $("#multiselect_to").find("option").remove();
+                $("#multiselect_to").append(str1);
+                userID = uid;
+            }
+        });
+    }
+    function submitUserRole(){
+        var selected = document.getElementById('multiselect_to');
+        var checkArray=new Array();
+        $.each(selected, function(idx, obj) {
+            var checkedRole = {};
+            checkedRole.roleID = obj.value;
+            checkedRole.roleName = obj.text;
+            checkArray.push(checkedRole);
+        });
+        var toJson =  JSON.stringify(checkArray);
+        $.ajax({
+            type : "POST",
+            dataType : "JSON",
+            url : "/user/UpdateRole/editUserRole/"+userID,
+            contentType : "application/json;charset=utf-8",
+            data : toJson
+        });
+        location.reload();
+    }
+    $(document).ready(function() {
+
+        if ( window.location.hash ) {
+            scrollTo(window.location.hash);
+        }
+
+        $('.nav').on('click', 'a', function(e) {
+            scrollTo($(this).attr('href'));
+        });
+        $('#multiselect').multiselect();
+        $('.multiselect').multiselect();
+        $('.js-multiselect').multiselect({
+            right: '#js_multiselect_to_1',
+            rightAll: '#js_right_All_1',
+            rightSelected: '#js_right_Selected_1',
+            leftSelected: '#js_left_Selected_1',
+            leftAll: '#js_left_All_1'
+        });
+
+        $('#keepRenderingSort').multiselect({
+            keepRenderingSort: true
+        });
+
+        $('#undo_redo').multiselect();
+    });
+
+    function scrollTo( id ) {
+        if ( $(id).length ) {
+            $('html,body').animate({scrollTop: $(id).offset().top - 40},'slow');
+        }
+    }
+</script>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Spring Security演示</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav" th:each="menu : ${menus}">
+                <li><a th:href="@{${menu.url}}" th:text="${menu.menuName}"></a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+
+<div class="container pageData">
+    <div class="starter-template">
+        <table class="table">
+            <tr><td>序号</td><td>账户</td><td>姓名</td><td>最近登录</td><td>上次登录IP</td><td>操作</td></tr>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.userID}"></td>
+                <td th:text="${user.account}"></td>
+                <td th:text="${user.realName}"></td>
+                <td th:text="${user.lastLoginTime}"></td>
+                <td th:text="${user.lastLoginIP}"></td>
+                <td><a sec:authorize="hasAuthority('button_5')" data-toggle="modal" th:onclick="'javascript:getUser('+${user.userID}+');'" data-target=".createUser">编辑</a>
+                    <a sec:authorize="hasAuthority('button_6')" data-toggle="modal" th:onclick="'javascript:getInfo('+${user.userID}+');'" data-target=".editUserRole">角色管理</a></td>
+            </tr>
+        </table>
+        <button sec:authorize="hasAuthority('button_1')" class="btn btn-primary" data-toggle="modal" data-target=".createUser">添加用户</button>
+    </div>
+</div>
+
+<!--添加用户-->
+<div class="modal fade createUser" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">添加用户</h4>
+            </div>
+            <div class="modal-body" style="text-align: center" >
+                <form name="form" th:action="@{/user/createUser}" method="POST"> <!-- 3 -->
+                    <div class="form-group">
+                        <label for="account">账号</label>
+                        <input type="text" class="form-control" name="account" value="" placeholder="账号" />
+                    </div>
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input type="password" class="form-control" name="password" placeholder="密码" />
+                    </div>
+                    <div class="form-group">
+                        <label for="password2">确认密码</label>
+                        <input type="password" class="form-control" name="password2" placeholder="确认密码" />
+                    </div>
+                    <input type="submit" id="create" value="添加" class="btn btn-primary"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade editUserRole" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">编辑</h4>
+            </div>
+            <div class="modal-body" style="text-align: center" >
+
+                <div class="row">
+                    <div class="col-sm-5">
+                        <select name="from" id="multiselect" class="form-control" size="8" multiple="multiple">
+
+                        </select>
+                    </div>
+
+                    <div class="col-sm-2">
+                        <button type="button" id="multiselect_rightAll" class="btn btn-block"><i class="glyphicon glyphicon-forward">》》</i></button>
+                        <button type="button" id="multiselect_rightSelected" class="btn btn-block"><i class="glyphicon glyphicon-chevron-right">》</i></button>
+                        <button type="button" id="multiselect_leftSelected" class="btn btn-block"><i class="glyphicon glyphicon-chevron-left">《</i></button>
+                        <button type="button" id="multiselect_leftAll" class="btn btn-block"><i class="glyphicon glyphicon-backward">《《</i></button>
+                    </div>
+
+                    <div class="col-sm-5">
+                        <select name="to" id="multiselect_to" class="form-control" size="8" multiple="multiple">
+
+                        </select>
+                    </div>
+
+                    <button class="btn btn-default" type="submit" onclick="javascript:submitUserRole()">确认</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

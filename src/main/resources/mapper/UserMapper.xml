@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dao.UserDao">
+
+    <select id="findByAccount" parameterType="String" resultType="com.iflytek.model.SYS_User">
+    SELECT * FROM sys_user WHERE Account = #{s}
+    </select>
+
+    <select id="findAll" resultType="com.iflytek.model.SYS_User">
+        SELECT * FROM sys_user
+    </select>
+
+    <insert id="createUser" parameterType="com.iflytek.model.SYS_User" >
+        INSERT INTO sys_user(account,password) VALUE (#{account},#{password});
+    </insert>
+
+    <insert id="createUserRole" parameterType="com.iflytek.model.SYS_User_Role" >
+        INSERT INTO sys_user_role(userID,roleID) VALUE (#{userID},#{roleID});
+    </insert>
+</mapper>
