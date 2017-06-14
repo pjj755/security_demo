@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dao.ButtonDao">
+
+
+    <select id="findById" parameterType="int" resultType="com.iflytek.model.SYS_Button">
+        SELECT * FROM sys_button WHERE btnID = #{bid}
+    </select>
+
+    <select id="getNoChoiceBtnAuth" parameterType="int" resultType="com.iflytek.model.SYS_Button">
+        SELECT sys_button.* FROM sys_button
+        WHERE sys_button.btnID NOT IN(
+        SELECT sys_button.btnID
+        FROM sys_button
+        INNER JOIN sys_permission
+        ON sys_permission.permissionAccess='button'
+        AND sys_permission.permissionAccessValue = sys_button.btnID
+        AND sys_permission.roleID = #{rid}
+        AND sys_permission.permissionOperation = 1
+)
+
+    </select>
+    <select id="getChoiceBtnAuth" parameterType="int" resultType="com.iflytek.model.SYS_Button">
+        SELECT sys_button.*
+        FROM sys_button
+        INNER JOIN sys_permission
+        ON sys_permission.permissionAccess='button'
+        AND sys_permission.permissionAccessValue = sys_button.btnID
+        AND sys_permission.roleID = #{rid}
+        AND sys_permission.permissionOperation = 1
+    </select>
+
+</mapper>
