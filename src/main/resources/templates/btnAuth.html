@@ -100,14 +100,20 @@
             <a class="navbar-brand" href="@{/}">Spring Security演示</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
-            <ul class="nav navbar-nav" th:each="menu : ${menus}">
-                <li><a th:href="@{${menu.url}}" th:text="${menu.menuName}"></a></li>
-                <li><a th:href="@{/logout}"></a></li>
+            <ul class="nav navbar-nav">
+                <li sec:authorize="hasAuthority('menu_1')"><a th:href="@{/}">首页</a></li>
+                <li sec:authorize="hasAuthority('menu_2')"><a th:href="@{/user}">用户管理</a></li>
+                <li sec:authorize="hasAuthority('menu_4')"><a th:href="@{/role}">角色管理</a></li>
+                <li sec:authorize="hasAuthority('menu_3')"  class="active"><a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">权限管理<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li sec:authorize="hasAuthority('menu_5')"><a th:href="@{/menuAuth}">菜单权限</a></li>
+                        <li sec:authorize="hasAuthority('menu_6')"><a th:href="@{/btnAuth}">按钮权限</a></li>
+                    </ul>
+                </li>
             </ul>
         </div><!--/.nav-collapse -->
     </div>
 </nav>
-
 <div class="container pageData">
     <div class="starter-template">
         <table class="table">

@@ -6,6 +6,10 @@
     SELECT * FROM sys_user WHERE Account = #{s}
     </select>
 
+    <select id="findByID" parameterType="int" resultType="com.iflytek.model.SYS_User">
+        SELECT * FROM sys_user WHERE userID = #{uid}
+    </select>
+
     <select id="findAll" resultType="com.iflytek.model.SYS_User">
         SELECT * FROM sys_user
     </select>
@@ -13,6 +17,10 @@
     <insert id="createUser" parameterType="com.iflytek.model.SYS_User" >
         INSERT INTO sys_user(account,password) VALUE (#{account},#{password});
     </insert>
+
+    <update id="updateUser" parameterType="com.iflytek.model.SYS_User" >
+        UPDATE sys_user SET realName = #{realName},email = #{email},phone= #{phone},address= #{address} where account = #{account}
+    </update>
 
     <insert id="createUserRole" parameterType="com.iflytek.model.SYS_User_Role" >
         INSERT INTO sys_user_role(userID,roleID) VALUE (#{userID},#{roleID});

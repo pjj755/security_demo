@@ -12,6 +12,8 @@ import java.util.List;
 public interface UserDao {
     public List<SYS_User> findAll();
     public SYS_User findByAccount(String s);
+    public SYS_User findByID(int uid);
     public int createUser(SYS_User u);
+    public boolean updateUser(SYS_User u);
     public int createUserRole(SYS_User_Role userRole);
 }

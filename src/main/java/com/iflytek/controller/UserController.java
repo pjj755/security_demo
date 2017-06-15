@@ -3,7 +3,9 @@ package com.iflytek.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.iflytek.dao.RoleDao;
 import com.iflytek.dao.UserDao;
-import com.iflytek.model.*;
+import com.iflytek.model.SYS_Role;
+import com.iflytek.model.SYS_User;
+import com.iflytek.model.SYS_User_Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,6 +39,28 @@ public class UserController extends BaseController{
         int i = userDao.createUser(u);
         System.out.println("----------------------------id______"+i);
         return "redirect:/user";
+    }
+
+    @RequestMapping(value = "/user/updateUser",method = RequestMethod.POST)
+    public String updateUser(SYS_User u){
+        System.out.println("___________________update"+u.getAccount());
+        boolean sss = userDao.updateUser(u);
+        System.out.println("___________________"+sss);
+        return "redirect:/user";
+    }
+
+    @RequestMapping(value="/user/UpdateUser/getUser/{uid}",method = RequestMethod.GET)
+    @ResponseBody
+    public JSONObject getUser(@PathVariable("uid")  int uid){
+
+        SYS_User user = userDao.findByID(uid);
+
+        JSONObject json = new JSONObject();
+        json.put("user",user);
+
+        System.out.println(json);
+
+        return json;
     }
 
     @RequestMapping(value="/user/UpdateRole/getInfo/{uid}",method = RequestMethod.GET)
